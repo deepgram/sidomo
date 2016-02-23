@@ -4,7 +4,7 @@
 
 ####How to install:
 ```bash
-pip install -e git+https://github.com/noajshu/sidomo.git#egg=sidomo
+pip install -e git+https://github.com/deepgram/sidomo.git#egg=sidomo
 ```
 
 ####How to use:
