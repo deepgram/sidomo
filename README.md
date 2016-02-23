@@ -17,6 +17,6 @@ pip install -e git+https://github.com/noajshu/sdpm.git#egg=sdpm
 from sdpm import Container
 
 with Container('ubuntu') as c:
-    for output_line in c.run('bash -c "echo hello world"'):
+    for output_line in c.run('echo hello world'):
         print(output_line)
 ```
