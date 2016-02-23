@@ -1,0 +1,27 @@
+"""A python FFMPEG module built from sdpm."""
+from sdpm import Container
+
+
+def transcode_file(url):
+    """Any format --> 20000 Hz mono wav audio."""
+    with Container(
+        'cellofellow/ffmpeg',
+        memory_limit_gb=2,
+        stderr=True,
+        stdout=False
+    ) as c:
+        for line in c.run(
+            'bash -c \"\
+                wget -nv -O tmp.unconverted %s;\
+                ffmpeg -i tmp.unconverted -f wav -acodec pcm_s16le -ac 1 -ar 20000 tmp.wav;\
+                cat tmp.wav\
+            \"\
+            ' % url
+        ):
+            yield line
+
+
+if __name__ == '__main__':
+    url = 'http://www2.warwick.ac.uk/fac/soc/sociology/staff/sfuller/media/audio/9_minutes_on_epistemology.mp3'
+    for line in transcode_file(url):
+        print line
