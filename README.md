@@ -1,6 +1,6 @@
-# sdpm
+#Sidomo
 
-###Simple Docker Python Module
+###Simple Docker Module
 
 ####Manages the lifecycle of a docker container.
 
