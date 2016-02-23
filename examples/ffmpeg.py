@@ -7,7 +7,6 @@ def transcode_file(url):
     with Container(
         'cellofellow/ffmpeg',
         memory_limit_gb=2,
-        stderr=True,
         stdout=False
     ) as c:
         for line in c.run(
@@ -22,6 +21,7 @@ def transcode_file(url):
 
 
 if __name__ == '__main__':
+    print "I'm gonna transcode an audio file and only print the stderr."
     url = 'http://www2.warwick.ac.uk/fac/soc/sociology/staff/sfuller/media/audio/9_minutes_on_epistemology.mp3'
     for line in transcode_file(url):
         print line
