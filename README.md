@@ -20,6 +20,10 @@ with Container('ubuntu') as c:
         print(output_line)
 ```
 
+####Examples:
+- hello_world.py is 'Hello, World!' as a module
+- ffmpeg.py fetches audio from a URL and transcodes it to WAV format
+
 ####Ideas:
 - Replace leaky glue code
 - Run Erlang from Python
