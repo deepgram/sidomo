@@ -1,5 +1,5 @@
 """A python FFMPEG module built from sdpm."""
-from sdpm import Container
+from sidomo import Container
 
 
 def transcode_file(url):

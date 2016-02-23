@@ -14,14 +14,14 @@ with open('./requirements.txt') as reqs_txt:
 
 
 setup(
-    name='sdpm',
+    name='sidomo',
     version='0.0.1',
-    description='Simple Docker Python Module',
+    description='Simple Docker Module',
     long_description=readme,
     install_requires=requirements,
     author='Noah Shutty',
     author_email='noah@deepgram.com',
-    url='https://github.com/noajshu/sdpm',
+    url='https://github.com/noajshu/sidomo',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )

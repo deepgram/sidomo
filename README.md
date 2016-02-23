@@ -2,21 +2,26 @@
 
 ###Simple Docker Module
 
-####Manages the lifecycle of a docker container.
+####Manages the lifecycle of a docker container. Extremely simple interface via the `with` statement.
 
 If you can get your software to work in a docker container, then this module will make it work in Python.
 
-
 ####How to install:
 ```bash
-pip install -e git+https://github.com/noajshu/sdpm.git#egg=sdpm
+pip install -e git+https://github.com/noajshu/sidomo.git#egg=sdpm
 ```
 
 ####How to use:
 ```python
-from sdpm import Container
+from sidomo import Container
 
 with Container('ubuntu') as c:
     for output_line in c.run('echo hello world'):
         print(output_line)
 ```
+
+####Ideas:
+- Replace leaky glue code
+- Run Erlang from Python
+- Resurrect legacy software for use in a modern environment
+- Make a Python module more portable (the only dependency is Docker itself)
