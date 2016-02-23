@@ -1,8 +1,6 @@
 #Sidomo
 
-##Simple Docker Module
-
-###If you can get your software to work in a docker container, then this module will make it work in Python.
+##Simple Docker Module: If you can get your software to work in a docker container, then this module will make it work in Python.
 
 ####How to install:
 ```bash
