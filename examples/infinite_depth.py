@@ -14,5 +14,8 @@ with open(os.path.abspath(__file__), "r") as infile:
 print "Hello from level %s" % level
 
 with Container('docker_and_sidomo_img') as c:
-    for line in c.run('python -c "' + self_str + '"'):
+    for line in c.run(
+        'bash -c "echo ' + self_str + ' > infinite_depth.py;' +
+        'python infinite_depth.py;"'
+    ):
         print line
