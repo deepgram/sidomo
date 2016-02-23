@@ -1,10 +1,8 @@
 #Sidomo
 
-###Simple Docker Module
+##Simple Docker Module
 
-####Manages the lifecycle of a docker container. Extremely simple interface via the `with` statement.
-
-If you can get your software to work in a docker container, then this module will make it work in Python.
+###If you can get your software to work in a docker container, then this module will make it work in Python.
 
 ####How to install:
 ```bash
