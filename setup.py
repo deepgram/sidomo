@@ -21,7 +21,7 @@ setup(
     install_requires=requirements,
     author='Noah Shutty',
     author_email='noah@deepgram.com',
-    url='https://github.com/noajshu/sidomo',
+    url='https://github.com/deepgram/sidomo',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )
