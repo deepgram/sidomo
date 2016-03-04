@@ -15,20 +15,29 @@ client = docker.Client(
 
 
 class Container:
-    """Represents a single docker container on the host."""
+    """
+    Represents a single docker container on the host.
+    
+    Volumes should be a list of mapped paths, e.g. ['/var/log/docker:/var/log/docker'].
+    """
 
-    def __init__(self, image, memory_limit_gb=4, stderr=True, stdout=True):
+    def __init__(self, image, memory_limit_gb=4, stderr=True, stdout=True, volumes=[]):
         self.image = image
         self.memory_limit_bytes = int(memory_limit_gb * 1e9)
         self.stderr = stderr
         self.stdout = stdout
+        self.volumes = [x[1]for x in map(lambda vol: vol.split(':'), volumes)]
+        self.binds = volumes
 
     def __enter__(self):
         """Power on."""
         self.container_id = client.create_container(
             image=self.image,
+            volumes=self.volumes,
             host_config=client.create_host_config(
-                mem_limit=self.memory_limit_bytes),
+                mem_limit=self.memory_limit_bytes,
+                binds=self.binds
+                ),
             stdin_open=True
         )['Id']
 
