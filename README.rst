@@ -9,7 +9,7 @@ How to install:
 
 .. code:: bash
 
-    pip install -e git+https://github.com/deepgram/sidomo.git#egg=sidomo
+    pip install -e git+https://github.com/caseyjlaw/sidomo.git#egg=sidomo
 
 How to use:
 ^^^^^^^^^^^
@@ -21,6 +21,10 @@ How to use:
     with Container('ubuntu') as c:
         for output_line in c.run('echo hello world'):
             print(output_line)
+
+Or with the command line tool "dodo" ("docker do"):
+::
+  dodo echo hello world --image ubuntu
 
 Examples:
 ^^^^^^^^^
