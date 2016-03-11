@@ -7,7 +7,7 @@ with Container(some_image) as c:
         print line
 """
 import docker
-import click
+import click, os
 
 
 # sets the docker host from your environment variables
@@ -22,13 +22,14 @@ class Container:
     Volumes should be a list of mapped paths, e.g. ['/var/log/docker:/var/log/docker'].
     """
 
-    def __init__(self, image, memory_limit_gb=4, stderr=True, stdout=True, volumes=[]):
+    def __init__(self, image, memory_limit_gb=4, stderr=True, stdout=True, volumes=[], cleanup=True):
         self.image = image
         self.memory_limit_bytes = int(memory_limit_gb * 1e9)
         self.stderr = stderr
         self.stdout = stdout
-        self.volumes = [x[1]for x in map(lambda vol: vol.split(':'), volumes)]
+        self.volumes = [x[1] for x in map(lambda vol: vol.split(':'), volumes)]
         self.binds = volumes
+        self.cleanup = cleanup
 
     def __enter__(self):
         """Power on."""
@@ -49,6 +50,8 @@ class Container:
     def __exit__(self, type, value, traceback):
         """Power off."""
         client.stop(self.container_id)
+        if self.cleanup:
+            client.remove_container(self.container_id)
 
     def run(self, command):
         """Just like 'docker run CMD'.
@@ -67,12 +70,28 @@ class Container:
 
 
 @click.command()
-@click.argument(image)
-@click.argument(command, nargs=+)
-def dodo(image, command):
-    """ Wrapper to make 'docker do' command to run in any image
+@click.argument('do', nargs=-1)
+@click.option('--image', help='Image name in which to run do', default=None)
+@click.option('--sharedir', help='Directory on host machine to mount to docker.', default=os.path.abspath(os.getcwd()))
+def dodo(do, image, sharedir):
+    """ dodo (like sudo but for docker) runs argument in a docker image.
+
+    do is the argument to execute in image.
+    image is set as "DODOIMAGE" environment variable.
+    sharedir (e.g., to pass data to command) is mounted (default: current directory).
     """
 
-    with Container(image) as c:
-    for output_line in c.run(command):
-        print(output_line)
+    if not image:
+        try:
+            image = os.environ['DODOIMAGE']
+        except KeyError:
+            print('No image provided or available as DODOIMAGE environment variable.')
+            raise
+
+    volumes = ['{}:/home'.format(sharedir)]
+
+    print('In {}, running: {}'.format(image, ' '.join(do)))
+
+    with Container(image, volumes=volumes) as c:
+        for output_line in c.run(do):
+            print(output_line)
