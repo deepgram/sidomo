@@ -9,7 +9,6 @@ with Container(some_image) as c:
 import docker
 import click, os
 
-
 # sets the docker host from your environment variables
 client = docker.Client(
     **docker.utils.kwargs_from_env(assert_hostname=False))
@@ -119,4 +118,4 @@ def dodo(do, image, sharedir, display):
 
     with Container(image, volumes=volumes, cleanup=True, environment=environment) as c:
         for output_line in c.run(do):
-            print('{0!s}:\t {1!s}'.format(image, output_line))
+            print('{}:\t {}'.format(image, output_line.decode('utf-8')))
