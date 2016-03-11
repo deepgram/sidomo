@@ -7,6 +7,7 @@ with Container(some_image) as c:
         print line
 """
 import docker
+import click
 
 
 # sets the docker host from your environment variables
@@ -63,3 +64,15 @@ class Container:
 
         for line in client.exec_start(exec_id, stream=True):
             yield line
+
+
+@click.command()
+@click.argument(image)
+@click.argument(command, nargs=+)
+def dodo(image, command):
+    """ Wrapper to make 'docker do' command to run in any image
+    """
+
+    with Container(image) as c:
+    for output_line in c.run(command):
+        print(output_line)

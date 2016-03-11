@@ -23,5 +23,9 @@ setup(
     author_email='noah@deepgram.com',
     url='https://github.com/deepgram/sidomo',
     license=license,
-    packages=find_packages(exclude=('tests', 'docs'))
+    packages=find_packages(exclude=('tests', 'docs')),
+    entry_points='''
+        [console_scripts]
+        dodo=sidomo.sidomo:dodo
+    ''',
 )
