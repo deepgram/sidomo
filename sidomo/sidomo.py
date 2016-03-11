@@ -114,6 +114,8 @@ def dodo(do, image, sharedir, display):
         environment = ['DISPLAY={}'.format(display)]
     elif 'DODODISPLAY' in os.environ:
         environment = ['DISPLAY={}'.format(os.environ['DODODISPLAY'])]
+    else:
+        environment = []
 
     with Container(image, volumes=volumes, cleanup=True, environment=environment) as c:
         for output_line in c.run(do):
