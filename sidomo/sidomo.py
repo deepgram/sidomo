@@ -22,7 +22,7 @@ class Container:
     Volumes should be a list of mapped paths, e.g. ['/var/log/docker:/var/log/docker'].
     """
 
-    def __init__(self, image, memory_limit_gb=4, stderr=True, stdout=True, volumes=[], cleanup=True):
+    def __init__(self, image, memory_limit_gb=4, stderr=True, stdout=True, volumes=[], cleanup=False):
         self.image = image
         self.memory_limit_bytes = int(memory_limit_gb * 1e9)
         self.stderr = stderr
@@ -53,6 +53,7 @@ class Container:
         if self.cleanup:
             client.remove_container(self.container_id)
 
+
     def run(self, command):
         """Just like 'docker run CMD'.
 
@@ -71,27 +72,38 @@ class Container:
 
 @click.command()
 @click.argument('do', nargs=-1)
-@click.option('--image', help='Image name in which to run do', default=None)
-@click.option('--sharedir', help='Directory on host machine to mount to docker.', default=os.path.abspath(os.getcwd()))
+@click.option('--image', '-i', help='Image name in which to run do', default=None)
+@click.option('--sharedir', '-s', help='Directory on host machine to mount to docker.', default=os.path.abspath(os.getcwd()))
 def dodo(do, image, sharedir):
     """ dodo (like sudo but for docker) runs argument in a docker image.
 
-    do is the argument to execute in image.
-    image is set as "DODOIMAGE" environment variable.
-    sharedir (e.g., to pass data to command) is mounted (default: current directory).
+    do is the command to run in the image.
+    image taken from (1) command-line, (2) "DODOIMAGE" environment variable, or (3) first built image.
+    sharedir (e.g., to pass data to command) is mounted (default: current directory). empty string does no mounting.
     """
 
+    # try to set image three ways
     if not image:
-        try:
+        if 'DODOIMAGE' in os.environ:
             image = os.environ['DODOIMAGE']
-        except KeyError:
-            print('No image provided or available as DODOIMAGE environment variable.')
-            raise
+        else:
+            ims = client.images()
+            if len(ims) >= 1:
+                image = [im['RepoTags'][0] for im in client.images()][0]
 
-    volumes = ['{}:/home'.format(sharedir)]
+    assert image, 'No image given or found locally.'
 
-    print('In {}, running: {}'.format(image, ' '.join(do)))
+    # get image if not available locally
+    imnames = [im['RepoTags'][0] for im in client.images()]
+    if (not any([image in imname for imname in imnames])) and client.search(image):
+        print('Image {} not found locally. Pulling from docker hub.'.format(image))
+        client.pull(image)
 
-    with Container(image, volumes=volumes) as c:
+    if sharedir:
+        volumes = ['{}:/home'.format(sharedir)]
+    else:
+        volumes = []
+
+    with Container(image, volumes=volumes, cleanup=True) as c:
         for output_line in c.run(do):
-            print(output_line)
+            print('{}:\t {}'.format(image, output_line))
