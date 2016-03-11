@@ -22,15 +22,15 @@ How to use:
         for output_line in c.run('echo hello world'):
             print(output_line)
 
-.. code:: bash
-    dodo echo hello world --image ubuntu
+Or with the command line tool "dodo" ("docker do"):
+::
+  dodo echo hello world --image ubuntu
 
 Examples:
 ^^^^^^^^^
 
 -  hello\_world.py is ‘Hello, World!’ as a module
 -  ffmpeg.py fetches audio from a URL and transcodes it to WAV format
--  dodo ("docker do") is like sudo, but for a docker container
 
 Ideas:
 ^^^^^^
