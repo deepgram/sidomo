@@ -22,7 +22,7 @@ class Container:
     Volumes should be a list of mapped paths, e.g. ['/var/log/docker:/var/log/docker'].
     """
 
-    def __init__(self, image, memory_limit_gb=4, stderr=True, stdout=True, volumes=[], cleanup=False):
+    def __init__(self, image, memory_limit_gb=4, stderr=True, stdout=True, volumes=[], cleanup=False, environment=[]):
         self.image = image
         self.memory_limit_bytes = int(memory_limit_gb * 1e9)
         self.stderr = stderr
@@ -30,6 +30,7 @@ class Container:
         self.volumes = [x[1] for x in map(lambda vol: vol.split(':'), volumes)]
         self.binds = volumes
         self.cleanup = cleanup
+        self.environment = environment
 
     def __enter__(self):
         """Power on."""
@@ -38,8 +39,9 @@ class Container:
             volumes=self.volumes,
             host_config=client.create_host_config(
                 mem_limit=self.memory_limit_bytes,
-                binds=self.binds
+                binds=self.binds,
                 ),
+            environment=self.environment,
             stdin_open=True
         )['Id']
 
@@ -74,12 +76,14 @@ class Container:
 @click.argument('do', nargs=-1)
 @click.option('--image', '-i', help='Image name in which to run do', default=None)
 @click.option('--sharedir', '-s', help='Directory on host machine to mount to docker.', default=os.path.abspath(os.getcwd()))
-def dodo(do, image, sharedir):
+@click.option('--display', '-d', help='Display variable to set for X11 forwarding.', default=None)
+def dodo(do, image, sharedir, display):
     """ dodo (like sudo but for docker) runs argument in a docker image.
 
     do is the command to run in the image.
     image taken from (1) command-line, (2) "DODOIMAGE" environment variable, or (3) first built image.
     sharedir (e.g., to pass data to command) is mounted (default: current directory). empty string does no mounting.
+    display is environment variable to set in docker image that allows X11 forwarding.
     """
 
     # try to set image three ways
@@ -99,11 +103,18 @@ def dodo(do, image, sharedir):
         print('Image {} not found locally. Pulling from docker hub.'.format(image))
         client.pull(image)
 
+    # mount directory in docker
     if sharedir:
         volumes = ['{}:/home'.format(sharedir)]
     else:
         volumes = []
 
-    with Container(image, volumes=volumes, cleanup=True) as c:
+    # set docker environment to display X11 locally
+    if display:
+        environment = ['DISPLAY={}'.format(display)]
+    elif 'DODODISPLAY' in os.environ:
+        environment = ['DISPLAY={}'.format(os.environ['DODODISPLAY'])]
+
+    with Container(image, volumes=volumes, cleanup=True, environment=environment) as c:
         for output_line in c.run(do):
             print('{}:\t {}'.format(image, output_line))
