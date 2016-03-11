@@ -119,4 +119,4 @@ def dodo(do, image, sharedir, display):
 
     with Container(image, volumes=volumes, cleanup=True, environment=environment) as c:
         for output_line in c.run(do):
-            print('{}:\t {}'.format(image, output_line))
+            print('{0!s}:\t {1!s}'.format(image, output_line))
